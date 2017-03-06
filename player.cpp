@@ -14,7 +14,10 @@ Player::Player(Side side) {
      * precalculating things, etc.) However, remember that you will only have
      * 30 seconds.
      */
-    hijosh = true;
+    board = new Board();
+    mySide = side;
+    if(mySide == BLACK){opSide = WHITE;}
+    else{opSide = BLACK;}
 }
 
 /*
@@ -41,5 +44,29 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
      * TODO: Implement how moves your AI should play here. You should first
      * process the opponent's opponents move before calculating your own move
      */
-    return nullptr;
+    board->doMove(opponentsMove,opSide);
+    vector <Move *> possiblemoves = legalMoves(board);
+    if(possiblemoves.size() == 0){
+        return nullptr;
+    }
+    else{
+        board->doMove(possiblemoves[0],mySide);
+    }
+    return possiblemoves[0];
+}
+
+vector <Move *> Player::legalMoves(Board * b){
+    vector <Move *> moves;
+    for(int i = 0; i < 8; i++){
+        for(int j = 0; j < 8; j++){
+            Move * move = new Move(i,j);
+            if(b->checkMove(move,mySide)){
+                moves.push_back(move);
+            }
+            else{
+                delete move;
+            }
+        }
+    }
+    return moves;
 }
