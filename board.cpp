@@ -45,6 +45,22 @@ bool Board::onBoard(int x, int y) {
     return(0 <= x && x < 8 && 0 <= y && y < 8);
 }
 
+vector <tuple<int,int,Side>> Board::getOccupied(){
+    vector <tuple<int,int,Side>> hello;
+    for(int i = 0; i < 8; i++){
+        for(int j = 0; j < 8; j++){
+            if(occupied(i,j)){
+                if(black[i + 8*j]){
+                    hello.push_back(make_tuple(i,j,BLACK));
+                }
+                else{
+                    hello.push_back(make_tuple(i,j,WHITE));
+                }
+            }
+        }
+    }
+    return hello;
+}
 
 /*
  * Returns true if the game is finished; false otherwise. The game is finished
