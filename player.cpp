@@ -24,6 +24,7 @@ Player::Player(Side side) {
  * Destructor for the player.
  */
 Player::~Player() {
+    delete board;
 }
 
 /*
@@ -86,6 +87,10 @@ Move *Player::bestMove(vector <Move*> m, Board * b){
         for(int j = 0; j < opLegalMoves.size(); j++) {
             copy2 = copy->copy();
             copy2->doMove(opLegalMoves[j],opSide);
+            if (getScore(copy2) < min) {
+                min = getScore(copy2);
+            }
+            /*
             vector <Move *> myLegalMoves2 = legalMoves(copy2,mySide);
             Board * copy3;
             for(int k = 0; k < myLegalMoves2.size(); k++) {
@@ -99,8 +104,11 @@ Move *Player::bestMove(vector <Move*> m, Board * b){
                     if(getScore(copy4) < min){
                         min = getScore(copy4);
                     }
+                    delete copy4;
                 }
+                delete copy3;
             }
+            */
             delete copy2;
         }
         if(min > max){
@@ -124,4 +132,14 @@ int Player::getScore(Board * b){
         }
     }
     return score;
+    /*
+    int score = 0;
+    bitset<64> taken = b->getTaken();
+    bitset<64> black = b->getBlack();
+    bitset<64> white = taken & black.flip();
+    for (int i = 0; i < 64; i++) {
+        score += black.test(i) * weightTable[i/8][i%8] - white.test(i) * weightTable[i/8][i%8];
+    }
+    cout<<score<<endl;
+    return score;*/
 }

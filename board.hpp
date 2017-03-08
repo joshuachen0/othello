@@ -30,6 +30,8 @@ public:
     int countBlack();
     int countWhite();
     vector <tuple<int,int,Side>> getOccupied();
+    bitset<64> getBlack() {return black;}
+    bitset<64> getTaken() {return taken;}
 
     void setBoard(char data[]);
 };
