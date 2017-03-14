@@ -74,72 +74,88 @@ vector <Move *> Player::legalMoves(Board * b, Side side){
     return moves;
 }
 
-Move *Player::bestMove(vector <Move*> m, Board * b){ 
+Move *Player::bestMove(vector <Move*> m, Board * b) { 
     int themove = 0;
-    int max = -9999999;
+    int max = -99999;
     Board * copy;
-    for(int i = 0; i < m.size(); i++) {
+
+    for (int i = 0; i < m.size(); i++) {
         copy = b->copy();
         copy->doMove(m[i],mySide);
         vector <Move *> opLegalMoves = legalMoves(copy, opSide);
-        int min = 99999; 
+        int min = 99999;
+
         Board * copy2;
-        for(int j = 0; j < opLegalMoves.size(); j++) {
+        for (int j = 0; j < opLegalMoves.size(); j++) {
             copy2 = copy->copy();
             copy2->doMove(opLegalMoves[j],opSide);
-            if (getScore(copy2) < min) {
-                min = getScore(copy2);
-            }
-            /*
             vector <Move *> myLegalMoves2 = legalMoves(copy2,mySide);
+
             Board * copy3;
-            for(int k = 0; k < myLegalMoves2.size(); k++) {
+            for (int k = 0; k < myLegalMoves2.size(); k++) {
                 copy3 = copy2->copy();
                 copy3->doMove(myLegalMoves2[k],mySide);
                 vector <Move *> opLegalMoves2 = legalMoves(copy3, opSide);
+
                 Board * copy4;
-                for(int w = 0; w < opLegalMoves2.size(); w++) {
+                for (int w = 0; w < opLegalMoves2.size(); w++) {
                     copy4 = copy3->copy();
                     copy4->doMove(opLegalMoves2[w],opSide);
-                    if(getScore(copy4) < min){
-                        min = getScore(copy4);
+
+                    int score = getScore(copy4);
+                    //score += 8 * m.size();
+                    score += 8 * myLegalMoves2.size();
+                    //score -= 8 * opLegalMoves.size();
+                    score -= 8 * opLegalMoves2.size();
+
+                    if (score < min) {
+                        min = score;
                     }
+
                     delete copy4;
                 }
+
                 delete copy3;
             }
-            */
+            
             delete copy2;
         }
-        if(min > max){
+
+        if (min > max) {
             max = min;
             themove = i; 
         }
+
         delete copy;
     }
+
     return m[themove];
 }
 
 int Player::getScore(Board * b){
+    // int score = 0;
+    // vector<tuple<int,int,Side>> occupied = b->getOccupied();
+    // for(int j = 0; j < occupied.size(); j++){
+    //     if(get<2>(occupied[j]) == opSide){
+    //         score -= weightTable[get<0>(occupied[j])][get<1>(occupied[j])];
+    //     }
+    //     else{
+    //         score += weightTable[get<0>(occupied[j])][get<1>(occupied[j])];            
+    //     }
+    // }
+    // return score;
     int score = 0;
-    vector<tuple<int,int,Side>> occupied = b->getOccupied();
-    for(int j = 0; j < occupied.size(); j++){
-        if(get<2>(occupied[j]) == opSide){
-            score -= weightTable[get<0>(occupied[j])][get<1>(occupied[j])];
-        }
-        else{
-            score += weightTable[get<0>(occupied[j])][get<1>(occupied[j])];            
-        }
-    }
-    return score;
-    /*
-    int score = 0;
+
     bitset<64> taken = b->getTaken();
     bitset<64> black = b->getBlack();
-    bitset<64> white = taken & black.flip();
-    for (int i = 0; i < 64; i++) {
-        score += black.test(i) * weightTable[i/8][i%8] - white.test(i) * weightTable[i/8][i%8];
+    bitset<64> white = taken & ~ black;
+
+    for (int i = 0; i < 8; i++) {
+        for (int j = 0; j < 8; j++) {
+            score += black.test(i*8+j) * weightTable[i][j];
+            score -= white.test(i*8+j) * weightTable[i][j];
+        }
     }
-    cout<<score<<endl;
-    return score;*/
+
+    return score;    
 }
